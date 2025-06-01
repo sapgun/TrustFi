@@ -28,12 +28,28 @@ import { EnhancedThreeScene } from "@/components/enhanced-three-scene"
 export default function TrustPortLanding() {
   const { scrollYProgress } = useScroll()
   const scrollProgress = useTransform(scrollYProgress, [0, 1], [0, 1])
+  const [mounted, setMounted] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+
+    // 모바일 감지
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
 
   return (
     <div className="min-h-screen bg-black text-white relative">
-      <InteractiveBackground scrollProgress={scrollProgress.get()} />
+      {mounted && <InteractiveBackground scrollProgress={scrollProgress.get()} />}
       <Header />
-      <HeroSection />
+      <HeroSection isMobile={isMobile} />
       <FeaturesSection />
       <UseCasesSection />
       <TechnologySection />
@@ -88,7 +104,7 @@ function Header() {
   )
 }
 
-function HeroSection() {
+function HeroSection({ isMobile }: { isMobile: boolean }) {
   const ref = useRef(null)
   const { scrollYProgress } = useScroll({
     target: ref,

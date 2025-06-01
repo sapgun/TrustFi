@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useRef, useEffect, useMemo } from "react"
+import { useRef, useEffect, useMemo, useState } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import { Points, PointMaterial, Sphere, MeshDistortMaterial, Float } from "@react-three/drei"
 import * as THREE from "three"
@@ -212,23 +212,68 @@ function ConnectionLines({ scrollProgress }: { scrollProgress: number }) {
 
 export function InteractiveBackground({ scrollProgress }: { scrollProgress: number }) {
   const mouse = useRef<[number, number]>([0, 0])
+  const [isClient, setIsClient] = useState(false)
+  const [webglSupported, setWebglSupported] = useState(true)
 
   useEffect(() => {
+    setIsClient(true)
+
+    // WebGL 지원 확인
+    try {
+      const canvas = document.createElement("canvas")
+      const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
+      if (!gl) {
+        setWebglSupported(false)
+      }
+    } catch (e) {
+      setWebglSupported(false)
+    }
+
     const handleMouseMove = (event: MouseEvent) => {
       mouse.current = [event.clientX, event.clientY]
     }
 
+    const handleTouchMove = (event: TouchEvent) => {
+      if (event.touches.length > 0) {
+        mouse.current = [event.touches[0].clientX, event.touches[0].clientY]
+      }
+    }
+
     window.addEventListener("mousemove", handleMouseMove)
-    return () => window.removeEventListener("mousemove", handleMouseMove)
+    window.addEventListener("touchmove", handleTouchMove, { passive: true })
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("touchmove", handleTouchMove)
+    }
   }, [])
+
+  // 클라이언트 사이드가 아니거나 WebGL을 지원하지 않는 경우 폴백
+  if (!isClient || !webglSupported) {
+    return (
+      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-black via-[#1C1F2A] to-black">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width%3D%2260%22 height%3D%2260%22 viewBox%3D%220 0 60 60%22 xmlns%3D%22http://www.w3.org/2000/svg%22%3E%3Cg fill%3D%22none%22 fillRule%3D%22evenodd%22%3E%3Cg fill%3D%22%2300C2A8%22 fillOpacity%3D%220.1%22%3E%3Ccircle cx%3D%2230%22 cy%3D%2230%22 r%3D%221%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="fixed inset-0 -z-10">
-      <Canvas camera={{ position: [0, 0, 10], fov: 60 }}>
-        <ambientLight intensity={0.2} />
-        <pointLight position={[10, 10, 10]} intensity={0.8} color="#00C2A8" />
-        <pointLight position={[-10, -10, -10]} intensity={0.5} color="#1C1F2A" />
-        <pointLight position={[0, 0, 5]} intensity={0.3} color="#ffffff" />
+      <Canvas
+        camera={{ position: [0, 0, 10], fov: 60 }}
+        dpr={[1, 2]}
+        onCreated={({ gl }) => {
+          gl.setClearColor("#000000", 1)
+        }}
+        onError={(error) => {
+          console.warn("WebGL Error:", error)
+          setWebglSupported(false)
+        }}
+      >
+        <ambientLight intensity={0.3} />
+        <pointLight position={[10, 10, 10]} intensity={0.6} color="#00C2A8" />
+        <pointLight position={[-10, -10, -10]} intensity={0.3} color="#1C1F2A" />
+        <pointLight position={[0, 0, 5]} intensity={0.2} color="#ffffff" />
 
         <ParticleField mouse={mouse} />
         <FloatingNodes scrollProgress={scrollProgress} />
