@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { generateRandomName } from "@/lib/utils/random-name"
 
 export async function syncUserToSupabase(privyUser: {
   id: string
@@ -13,7 +14,7 @@ export async function syncUserToSupabase(privyUser: {
   const supabase = await createClient()
 
   const email = privyUser.email?.address || privyUser.google?.email || null
-  const displayName = privyUser.google?.name || email?.split("@")[0] || "사용자"
+  const displayName = privyUser.google?.name || generateRandomName()
   const avatarUrl = privyUser.google?.picture || null
 
   const { data: existingProfile, error: fetchError } = await supabase
@@ -34,7 +35,6 @@ export async function syncUserToSupabase(privyUser: {
       .from("user_profiles")
       .update({
         email,
-        display_name: displayName,
         avatar_url: avatarUrl,
         updated_at: new Date().toISOString(),
       })

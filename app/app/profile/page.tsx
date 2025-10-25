@@ -4,7 +4,7 @@ import { usePrivy } from "@privy-io/react-auth"
 import { useEffect, useState } from "react"
 import { syncUserToSupabase } from "@/lib/auth/sync-user"
 import { createClient } from "@/lib/supabase/client"
-import { User, Mail, Shield, Calendar, Award } from "lucide-react"
+import { User, Mail, Shield, Calendar, Award, Camera } from "lucide-react"
 
 interface UserProfile {
   id: string
@@ -24,6 +24,8 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
   const [displayName, setDisplayName] = useState("")
+  const [avatarUrl, setAvatarUrl] = useState("")
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     if (ready && authenticated && user) {
@@ -46,6 +48,7 @@ export default function ProfilePage() {
         if (data) {
           setProfile(data)
           setDisplayName(data.display_name || "")
+          setAvatarUrl(data.avatar_url || "")
         }
       }
     } catch (error) {
@@ -62,16 +65,23 @@ export default function ProfilePage() {
       const supabase = createClient()
       const { error } = await supabase
         .from("user_profiles")
-        .update({ display_name: displayName })
+        .update({
+          display_name: displayName,
+          avatar_url: avatarUrl,
+        })
         .eq("privy_user_id", user.id)
 
       if (!error) {
-        setProfile({ ...profile, display_name: displayName })
+        setProfile({ ...profile, display_name: displayName, avatar_url: avatarUrl })
         setEditing(false)
       }
     } catch (error) {
       console.error("[v0] Failed to update profile:", error)
     }
+  }
+
+  const handleImageUrlChange = (url: string) => {
+    setAvatarUrl(url)
   }
 
   if (!ready || loading) {
@@ -124,15 +134,22 @@ export default function ProfilePage() {
         {/* 프로필 카드 */}
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
           <div className="flex items-start gap-6">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-teal-400 to-cyan-400 flex items-center justify-center text-white text-3xl font-bold">
-              {profile.avatar_url ? (
-                <img
-                  src={profile.avatar_url || "/placeholder.svg"}
-                  alt="프로필"
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                <User className="w-12 h-12" />
+            <div className="relative">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-teal-400 to-cyan-400 flex items-center justify-center text-white text-3xl font-bold overflow-hidden">
+                {(editing ? avatarUrl : profile.avatar_url) ? (
+                  <img
+                    src={(editing ? avatarUrl : profile.avatar_url) || "/placeholder.svg"}
+                    alt="프로필"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User className="w-12 h-12" />
+                )}
+              </div>
+              {editing && (
+                <div className="absolute -bottom-2 -right-2 bg-teal-500 rounded-full p-2 cursor-pointer hover:bg-teal-600 transition-colors">
+                  <Camera className="w-4 h-4 text-white" />
+                </div>
               )}
             </div>
 
@@ -143,6 +160,7 @@ export default function ProfilePage() {
                     type="text"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="이름 입력"
                     className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white"
                   />
                 ) : (
@@ -160,6 +178,22 @@ export default function ProfilePage() {
                 <span>{profile.email || "이메일 없음"}</span>
               </div>
 
+              {editing && (
+                <div className="mb-4">
+                  <label className="block text-sm text-slate-400 mb-2">프로필 사진 URL</label>
+                  <input
+                    type="url"
+                    value={avatarUrl}
+                    onChange={(e) => handleImageUrlChange(e.target.value)}
+                    placeholder="https://example.com/image.jpg"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">
+                    이미지 URL을 입력하거나 비워두면 기본 아바타가 표시됩니다
+                  </p>
+                </div>
+              )}
+
               {editing ? (
                 <div className="flex gap-2">
                   <button
@@ -172,6 +206,7 @@ export default function ProfilePage() {
                     onClick={() => {
                       setEditing(false)
                       setDisplayName(profile.display_name || "")
+                      setAvatarUrl(profile.avatar_url || "")
                     }}
                     className="px-4 py-2 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 transition-colors"
                   >
