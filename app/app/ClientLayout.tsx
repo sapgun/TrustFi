@@ -3,16 +3,12 @@
 import type React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Star, CreditCard, Globe, Wallet } from "lucide-react"
+import { LayoutDashboard, Star, CreditCard, Globe, Wallet, User } from "lucide-react"
 import { usePrivy } from "@privy-io/react-auth"
 import { useEffect, useState } from "react"
 import { syncUserToSupabase } from "@/lib/auth/sync-user"
 
-export default function ClientLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [mounted, setMounted] = useState(false)
 
@@ -45,8 +41,10 @@ export default function ClientLayout({
     )
   }
 
-  const walletAddress = user?.wallet?.address
-  const displayAddress = walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : "연결됨"
+  const userEmail = user?.email?.address || user?.google?.email
+  const displayName =
+    userEmail ||
+    (user?.wallet?.address ? `${user.wallet.address.slice(0, 6)}...${user.wallet.address.slice(-4)}` : "사용자")
 
   return (
     <div className="min-h-screen bg-slate-950">
@@ -80,31 +78,35 @@ export default function ClientLayout({
             </div>
 
             <div className="flex items-center gap-3">
-              {authenticated && (
-                <Link
-                  href="/app/profile"
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                    pathname === "/app/profile"
-                      ? "bg-teal-500/10 text-teal-400 font-semibold border border-teal-500/20"
-                      : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
-                  }`}
+              {authenticated ? (
+                <>
+                  <Link
+                    href="/app/profile"
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                      pathname === "/app/profile"
+                        ? "bg-teal-500/10 text-teal-400 font-semibold border border-teal-500/20"
+                        : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                    }`}
+                  >
+                    <User className="w-4 h-4" />
+                    <span className="hidden sm:inline">{displayName}</span>
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="px-4 py-2 text-slate-400 hover:text-slate-200 font-semibold transition-colors"
+                  >
+                    로그아웃
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={login}
+                  className="flex items-center gap-2 px-4 py-2 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 transition-colors"
                 >
                   <Wallet className="w-4 h-4" />
-                  <span>프로필</span>
-                </Link>
+                  로그인
+                </button>
               )}
-
-              <button
-                onClick={() => (authenticated ? logout() : login())}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors ${
-                  authenticated
-                    ? "bg-green-500/10 text-green-400 border border-green-500/20"
-                    : "bg-teal-500 text-white hover:bg-teal-600"
-                }`}
-              >
-                <Wallet className="w-4 h-4" />
-                {authenticated ? displayAddress : "로그인"}
-              </button>
             </div>
           </div>
         </div>
