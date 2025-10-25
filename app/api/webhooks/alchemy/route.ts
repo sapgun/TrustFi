@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
     }
 
-    const isValid = isValidAlchemySignature(body, signature, signingKey)
+    const isValid = await isValidAlchemySignature(body, signature, signingKey)
     if (!isValid) {
       console.error("[v0] Invalid signature")
       return NextResponse.json({ error: "Invalid signature" }, { status: 403 })
