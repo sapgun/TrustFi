@@ -93,7 +93,10 @@ export async function simulateTransaction(params: SimulateTransactionParams, cha
 /**
  * Analyze simulation results for security risks
  */
-export function analyzeSecurityRisks(simulation: SimulationResult, userAddress: string): SecurityAnalysis {
+export async function analyzeSecurityRisks(
+  simulation: SimulationResult,
+  userAddress: string,
+): Promise<SecurityAnalysis> {
   const warnings: string[] = []
   const recommendations: string[] = []
   let riskLevel: SecurityAnalysis["riskLevel"] = "LOW"
@@ -183,7 +186,7 @@ export function analyzeSecurityRisks(simulation: SimulationResult, userAddress: 
 /**
  * Format asset changes for display
  */
-export function formatAssetChanges(changes: AssetChange[]): string {
+export async function formatAssetChanges(changes: AssetChange[]): Promise<string> {
   if (changes.length === 0) {
     return "No asset changes detected"
   }
