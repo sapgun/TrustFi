@@ -5,30 +5,57 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { getWalletBalance } from "@/app/actions/blockchain"
+import { getCachedTrustScore, TrustScoreBreakdown } from "@/lib/trust-score/calculator"
 
 export default function DashboardContent() {
   const { ready, authenticated } = usePrivy()
   const { wallets } = useWallets()
-  const [ethBalance, setEthBalance] = useState("0.0000")
-  const [loading, setLoading] = useState(false)
 
-  const embeddedWallet = wallets.find((w) => w.walletClientType === "privy")
+  // State from TrustFi-update branch
+  const [ethBalance, setEthBalance] = useState("0.0000")
+  const [loadingBalance, setLoadingBalance] = useState(true)
+
+  // State from feat-implement-trust-score-and-transaction branch
+  const [trustScore, setTrustScore] = useState<TrustScoreBreakdown | null>(null)
+  const [loadingScore, setLoadingScore] = useState(true)
 
   useEffect(() => {
+    const embeddedWallet = wallets.find((w) => w.walletClientType === "privy")
     if (embeddedWallet?.address && ready && authenticated) {
-      loadBalance()
+      loadAllData(embeddedWallet.address)
     }
-  }, [embeddedWallet?.address, ready, authenticated])
+  }, [wallets, ready, authenticated])
 
-  const loadBalance = async () => {
-    if (!embeddedWallet?.address) return
-
-    setLoading(true)
-    const result = await getWalletBalance(embeddedWallet.address, 1)
-    if (result.success) {
-      setEthBalance(result.formatted)
+  // Combined data loading function
+  const loadAllData = async (address: string) => {
+    // Load balance using server action (from TrustFi-update)
+    setLoadingBalance(true)
+    const balanceResult = await getWalletBalance(address, 1)
+    if (balanceResult.success) {
+      setEthBalance(balanceResult.formatted)
     }
-    setLoading(false)
+    setLoadingBalance(false)
+
+    // Load trust score (from feat-implement-trust-score-and-transaction)
+    setLoadingScore(true)
+    try {
+      const score = await getCachedTrustScore(address)
+      setTrustScore(score)
+    } catch (error) {
+      console.error("Failed to load trust score:", error)
+    } finally {
+      setLoadingScore(false)
+    }
+  }
+
+  // Tier calculation function (from feat-implement-trust-score-and-transaction)
+  const getTier = (score: number | undefined) => {
+    if (!score) return "N/A"
+    if (score >= 800) return "Diamond"
+    if (score >= 700) return "Platinum"
+    if (score >= 600) return "Gold"
+    if (score >= 500) return "Silver"
+    return "Bronze"
   }
 
   return (
@@ -47,21 +74,28 @@ export default function DashboardContent() {
           <div className="bg-white/20 backdrop-blur-sm px-6 py-4 rounded-lg">
             <div className="text-teal-100 text-sm mb-1">Ethereum Balance</div>
             <div className="text-3xl font-bold">
-              {loading ? <span className="animate-pulse">로딩...</span> : `${ethBalance} ETH`}
+              {/* Merged UI for balance */}
+              {loadingBalance ? <span className="animate-pulse">...</span> : `${ethBalance} ETH`}
             </div>
           </div>
           <div className="bg-white/20 backdrop-blur-sm px-6 py-4 rounded-lg">
             <div className="text-teal-100 text-sm mb-1">Trust Score</div>
-            <div className="text-3xl font-bold">850</div>
+            <div className="text-3xl font-bold">
+              {/* Merged UI for trust score */}
+              {loadingScore ? <span className="animate-pulse">...</span> : trustScore?.total ?? 'N/A'}
+            </div>
           </div>
           <div className="bg-white/20 backdrop-blur-sm px-6 py-4 rounded-lg">
             <div className="text-teal-100 text-sm mb-1">Tier</div>
-            <div className="text-3xl font-bold">Gold</div>
+            <div className="text-3xl font-bold">
+              {/* Merged UI for tier */}
+              {loadingScore ? <span className="animate-pulse">...</span> : getTier(trustScore?.total)}
+            </div>
           </div>
         </div>
       </motion.div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions (No conflicts here) */}
       <div className="grid md:grid-cols-3 gap-6">
         {[
           {
