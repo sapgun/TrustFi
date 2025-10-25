@@ -1,12 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { usePrivy, useWallets } from "@privy-io/react-auth"
 import { motion, AnimatePresence } from "framer-motion"
 import { Shield, CheckCircle, Clock } from "lucide-react"
 import { generateNLReview, type NLReviewResult } from "@/lib/security/nl-review"
 import { runSecurityLayers, type SecurityCheckResult } from "@/lib/security/security-layers"
 import { simulateTransaction } from "@/lib/alchemy/transaction-simulator"
+import { getCachedTrustScore } from "@/lib/trust-score/calculator"
+import { getTrustNFT, mintTrustNFT, updateTrustNFT } from "@/lib/nft/trust-nft"
+import TrustNFTBadge from "@/components/nft/TrustNFTBadge"
 
 export default function SecureSendTransaction() {
   const { ready, authenticated } = usePrivy()
@@ -22,7 +25,32 @@ export default function SecureSendTransaction() {
   const [canCancel, setCanCancel] = useState(false)
   const [cancelTimer, setCancelTimer] = useState(0)
 
+  const [recipientNFT, setRecipientNFT] = useState<any>(null)
+  const [loadingRecipient, setLoadingRecipient] = useState(false)
+
   const wallet = ready && wallets.length > 0 ? wallets[0] : null
+
+  useEffect(() => {
+    async function loadRecipientNFT() {
+      if (!to || to.length < 42) {
+        setRecipientNFT(null)
+        return
+      }
+
+      setLoadingRecipient(true)
+      try {
+        const nft = await getTrustNFT(to)
+        setRecipientNFT(nft)
+      } catch (error) {
+        console.error("[v0] Failed to load recipient NFT:", error)
+        setRecipientNFT(null)
+      } finally {
+        setLoadingRecipient(false)
+      }
+    }
+
+    loadRecipientNFT()
+  }, [to])
 
   const handleAnalyze = async () => {
     if (!to || !amount || !wallet) return
@@ -84,22 +112,65 @@ export default function SecureSendTransaction() {
     }
   }
 
-  const executeTransaction = () => {
+  const executeTransaction = async () => {
     console.log("[v0] Executing transaction...")
-    setStep("success")
-    setCanCancel(true)
-    setCancelTimer(30)
+    setStep("executing")
 
-    const interval = setInterval(() => {
-      setCancelTimer((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval)
-          setCanCancel(false)
-          return 0
-        }
-        return prev - 1
+    try {
+      if (!wallet) throw new Error("Wallet not found")
+
+      const provider = await wallet.getEthereumProvider()
+
+      const txHash = await provider.request({
+        method: "eth_sendTransaction",
+        params: [
+          {
+            from: wallet.address,
+            to,
+            value: `0x${(Number.parseFloat(amount) * 1e18).toString(16)}`,
+            gas: "0x5208",
+          },
+        ],
       })
-    }, 1000)
+
+      console.log("[v0] Transaction sent:", txHash)
+
+      await updateUserTrustScore(wallet.address)
+
+      setStep("success")
+      setCanCancel(true)
+      setCancelTimer(30)
+
+      const interval = setInterval(() => {
+        setCancelTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval)
+            setCanCancel(false)
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    } catch (error) {
+      console.error("[v0] Transaction failed:", error)
+      alert("거래 실행 실패: " + (error as Error).message)
+      setStep("input")
+    }
+  }
+
+  const updateUserTrustScore = async (address: string) => {
+    try {
+      const trustScore = await getCachedTrustScore(address)
+      const existingNFT = await getTrustNFT(address)
+
+      if (existingNFT) {
+        await updateTrustNFT(address, trustScore.total)
+      } else if (trustScore.total >= 20) {
+        await mintTrustNFT(address, trustScore.total)
+      }
+    } catch (error) {
+      console.error("[v0] Failed to update Trust Score:", error)
+    }
   }
 
   const handleCancel = () => {
@@ -150,6 +221,17 @@ export default function SecureSendTransaction() {
                 placeholder="0x..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
               />
+
+              {loadingRecipient && <div className="mt-2 text-sm text-gray-500">수신자 신뢰도 확인 중...</div>}
+              {recipientNFT && (
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-sm text-gray-600">수신자 신뢰도:</span>
+                  <TrustNFTBadge tier={recipientNFT.tier} trustScore={recipientNFT.trustScore} size="sm" />
+                </div>
+              )}
+              {!loadingRecipient && to.length >= 42 && !recipientNFT && (
+                <div className="mt-2 text-sm text-yellow-600">⚠️ 수신자의 Trust Score NFT가 없습니다</div>
+              )}
             </div>
 
             <div>
