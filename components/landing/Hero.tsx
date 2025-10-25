@@ -15,12 +15,12 @@ export default function Hero() {
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-32">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-          <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 leading-[1.1] tracking-tight">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-400">
-              누구나. 어떤 체인이든.
+          <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 leading-[1.2] tracking-tight">
+            <span className="block mb-2">누구나</span>
+            <span className="block mb-2">어떤 체인이든</span>
+            <span className="block bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-400">
+              안전하게 한 번에
             </span>
-            <br />
-            안전하게 한 번에
           </h1>
 
           <p className="text-xl md:text-2xl text-slate-400 mb-6 max-w-3xl mx-auto leading-relaxed">
