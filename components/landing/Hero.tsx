@@ -57,7 +57,7 @@ export default function Hero() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
             {[
-              { value: "99.8%", label: "델타 중립" },
+              { value: "99.9%", label: "신원 검증 성공률" },
               { value: "6-Layer", label: "보안 OS" },
               { value: "10+", label: "지원 체인" },
               { value: "$0", label: "온보딩 비용" },
