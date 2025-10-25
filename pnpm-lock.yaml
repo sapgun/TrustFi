@@ -21,7 +21,7 @@ importers:
         specifier: latest
         version: 3.4.1(ace501e9f3bb7332d18063438fd140d6)
       '@privy-io/wagmi':
-        specifier: ^2.0.2
+        specifier: latest
         version: 2.0.2(@privy-io/react-auth@3.4.1(ace501e9f3bb7332d18063438fd140d6))(react@18.2.0)(viem@2.38.4(bufferutil@4.0.9)(typescript@5.0.2)(utf-8-validate@5.0.10)(zod@3.25.76))(wagmi@2.18.2(@tanstack/query-core@5.90.5)(@tanstack/react-query@5.90.5(react@18.2.0))(@types/react@18.0.0)(bufferutil@4.0.9)(immer@10.2.0)(react@18.2.0)(typescript@5.0.2)(utf-8-validate@5.0.10)(viem@2.38.4(bufferutil@4.0.9)(typescript@5.0.2)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76))
       '@radix-ui/react-accordion':
         specifier: 1.2.2
