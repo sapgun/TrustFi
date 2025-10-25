@@ -12,32 +12,39 @@ export default function TrustScoreDisplay() {
   const [trustScore, setTrustScore] = useState<UserTrustScore | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const embeddedWallet = ready ? wallets.find((w) => w.walletClientType === "privy") : null
+  const wallet = ready && wallets.length > 0 ? wallets[0] : null
 
   useEffect(() => {
+    console.log("[v0] TrustScoreDisplay - Privy ready:", ready)
+    console.log("[v0] TrustScoreDisplay - wallets:", wallets)
+    console.log("[v0] TrustScoreDisplay - selected wallet:", wallet)
+
     if (!ready) {
       setLoading(true)
       return
     }
 
     async function loadScore() {
-      if (!embeddedWallet?.address) {
+      if (!wallet?.address) {
+        console.log("[v0] TrustScoreDisplay - No wallet address")
         setLoading(false)
         return
       }
 
       try {
-        const score = await getCachedTrustScore(embeddedWallet.address)
+        console.log("[v0] TrustScoreDisplay - Loading score for:", wallet.address)
+        const score = await getCachedTrustScore(wallet.address)
+        console.log("[v0] TrustScoreDisplay - Score loaded:", score)
         setTrustScore(score)
       } catch (error) {
-        console.error("Trust Score 로딩 실패:", error)
+        console.error("[v0] Trust Score 로딩 실패:", error)
       } finally {
         setLoading(false)
       }
     }
 
     loadScore()
-  }, [embeddedWallet?.address, ready])
+  }, [wallet, ready]) // Updated dependency array
 
   if (loading || !ready) {
     return (
