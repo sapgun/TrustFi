@@ -6,6 +6,7 @@ import { mainnet } from "wagmi/chains"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
+import { getCachedTrustScore, TrustScoreBreakdown } from "@/lib/trust-score/calculator"
 
 export default function Dashboard() {
   const [mounted, setMounted] = useState(false)
@@ -20,9 +21,38 @@ export default function Dashboard() {
     },
   })
 
+  const [trustScore, setTrustScore] = useState<TrustScoreBreakdown | null>(null);
+  const [loadingScore, setLoadingScore] = useState(true);
+
   useEffect(() => {
     setMounted(true)
-  }, [])
+
+    async function loadScore() {
+      if (!wallets[0]?.address) return;
+      setLoadingScore(true);
+      try {
+        const score = await getCachedTrustScore(wallets[0].address);
+        setTrustScore(score);
+      } catch (error) {
+        console.error("Failed to load trust score:", error);
+      } finally {
+        setLoadingScore(false);
+      }
+    }
+
+    if (authenticated && ready) {
+      loadScore();
+    }
+  }, [wallets, authenticated, ready])
+
+  const getTier = (score: number | undefined) => {
+    if (!score) return "N/A";
+    if (score >= 800) return "Diamond";
+    if (score >= 700) return "Platinum";
+    if (score >= 600) return "Gold";
+    if (score >= 500) return "Silver";
+    return "Bronze";
+  }
 
   if (!mounted || !ready) {
     return (
@@ -65,11 +95,15 @@ export default function Dashboard() {
           </div>
           <div className="bg-white/20 backdrop-blur-sm px-6 py-4 rounded-lg">
             <div className="text-teal-100 text-sm mb-1">Trust Score</div>
-            <div className="text-3xl font-bold">850</div>
+            <div className="text-3xl font-bold">
+              {loadingScore ? '...' : trustScore?.total ?? 'N/A'}
+            </div>
           </div>
           <div className="bg-white/20 backdrop-blur-sm px-6 py-4 rounded-lg">
             <div className="text-teal-100 text-sm mb-1">Tier</div>
-            <div className="text-3xl font-bold">Gold</div>
+            <div className="text-3xl font-bold">
+              {loadingScore ? '...' : getTier(trustScore?.total)}
+            </div>
           </div>
         </div>
       </motion.div>
