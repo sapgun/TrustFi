@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server"
 import type { AlchemyWebhookEvent, AddressActivityEvent, WebhookProcessingResult } from "./webhook-types"
+import { canUpgradeNFT } from "@/lib/nft/trust-nft"
 
 /**
  * Alchemy Webhook 이벤트 처리
@@ -148,6 +149,15 @@ async function updateUserTrustScore(userId: string): Promise<void> {
     .eq("id", userId)
 
   console.log("[v0] Trust Score updated for user:", userId, "Score:", score)
+
+  const { data: user } = await supabase.from("users").select("wallet_address").eq("id", userId).single()
+
+  if (user?.wallet_address) {
+    const canUpgrade = await canUpgradeNFT(user.wallet_address, score)
+    if (canUpgrade) {
+      await sendNFTUpgradeNotification(userId, score)
+    }
+  }
 }
 
 /**
@@ -207,4 +217,36 @@ async function sendSecurityNotification(userId: string, activity: any): Promise<
   })
 
   console.log("[v0] Security notification sent to user:", userId)
+}
+
+/**
+ * NFT 업그레이드 알림 발송
+ */
+async function sendNFTUpgradeNotification(userId: string, newScore: number): Promise<void> {
+  const supabase = await createClient()
+
+  // 이미 같은 알림이 있는지 확인 (중복 방지)
+  const { data: existingNotification } = await supabase
+    .from("notifications")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("type", "nft_upgrade_available")
+    .eq("read", false)
+    .single()
+
+  if (existingNotification) {
+    console.log("[v0] NFT upgrade notification already exists for user:", userId)
+    return
+  }
+
+  await supabase.from("notifications").insert({
+    user_id: userId,
+    type: "nft_upgrade_available",
+    title: "Trust NFT 업그레이드 가능",
+    message: `Trust Score가 ${newScore}점으로 상승했습니다! 프로필 페이지에서 NFT를 업그레이드하세요.`,
+    data: { new_score: newScore },
+    created_at: new Date().toISOString(),
+  })
+
+  console.log("[v0] NFT upgrade notification sent to user:", userId)
 }

@@ -76,7 +76,7 @@ Trust Score NFT를 발급합니다.
 **Returns:**
 - `TrustNFTData` 또는 `null`
 
-### updateTrustNFT(address, newScore)
+### upgradeTrustNFT(address, newScore)
 
 기존 NFT의 점수와 티어를 업데이트합니다.
 
@@ -123,9 +123,9 @@ if (recipientNFT) {
 ### 3. 점수 업데이트
 
 \`\`\`typescript
-import { updateTrustNFT } from "@/lib/nft/trust-nft"
+import { upgradeTrustNFT } from "@/lib/nft/trust-nft"
 
-await updateTrustNFT(userAddress, 65)
+await upgradeTrustNFT(userAddress, 65)
 // 티어가 SILVER에서 GOLD로 자동 업그레이드
 \`\`\`
 

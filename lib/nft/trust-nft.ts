@@ -59,13 +59,30 @@ export async function mintTrustNFT(address: string, trustScore: number): Promise
   }
 }
 
-export async function updateTrustNFT(address: string, newScore: number): Promise<boolean> {
+export async function canUpgradeNFT(address: string, currentScore: number): Promise<boolean> {
+  try {
+    const nft = await getTrustNFT(address)
+    if (!nft) return false
+
+    const currentTier = nft.tier
+    const newTier = calculateTier(currentScore)
+
+    // 티어가 상승했는지 확인
+    const tierOrder = { BRONZE: 0, SILVER: 1, GOLD: 2, PLATINUM: 3 }
+    return tierOrder[newTier] > tierOrder[currentTier]
+  } catch (error) {
+    console.error("[v0] Check upgrade error:", error)
+    return false
+  }
+}
+
+export async function upgradeTrustNFT(address: string, newScore: number): Promise<TrustNFTData | null> {
   try {
     const supabase = await createClient()
 
     const tier = calculateTier(newScore)
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("trust_nfts")
       .update({
         trust_score: newScore,
@@ -73,17 +90,26 @@ export async function updateTrustNFT(address: string, newScore: number): Promise
         last_updated: new Date().toISOString(),
       })
       .eq("user_address", address.toLowerCase())
+      .select()
+      .single()
 
     if (error) {
-      console.error("[v0] Failed to update NFT:", error)
-      return false
+      console.error("[v0] Failed to upgrade NFT:", error)
+      return null
     }
 
-    console.log("[v0] Trust NFT updated for", address)
-    return true
+    console.log("[v0] Trust NFT upgraded for", address)
+
+    return {
+      tokenId: data.token_id,
+      trustScore: data.trust_score,
+      tier: data.tier,
+      mintedAt: new Date(data.minted_at),
+      lastUpdated: new Date(data.last_updated),
+    }
   } catch (error) {
-    console.error("[v0] Update NFT error:", error)
-    return false
+    console.error("[v0] Upgrade NFT error:", error)
+    return null
   }
 }
 

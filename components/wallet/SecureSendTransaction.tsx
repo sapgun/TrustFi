@@ -8,7 +8,7 @@ import { generateNLReview, type NLReviewResult } from "@/lib/security/nl-review"
 import { runSecurityLayers, type SecurityCheckResult } from "@/lib/security/security-layers"
 import { simulateTransaction } from "@/lib/alchemy/transaction-simulator"
 import { getCachedTrustScore } from "@/lib/trust-score/calculator"
-import { getTrustNFT, mintTrustNFT, updateTrustNFT } from "@/lib/nft/trust-nft"
+import { getTrustNFT, mintTrustNFT, upgradeTrustNFT } from "@/lib/nft/trust-nft"
 import TrustNFTBadge from "@/components/nft/TrustNFTBadge"
 
 export default function SecureSendTransaction() {
@@ -164,7 +164,7 @@ export default function SecureSendTransaction() {
       const existingNFT = await getTrustNFT(address)
 
       if (existingNFT) {
-        await updateTrustNFT(address, trustScore.total)
+        await upgradeTrustNFT(address, trustScore.total)
       } else if (trustScore.total >= 20) {
         await mintTrustNFT(address, trustScore.total)
       }
