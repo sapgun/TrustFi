@@ -20,19 +20,35 @@ export default function Home() {
     <main className="min-h-screen">
       <Navbar />
       <Hero />
-      <DemoSection />
-      <ProofOfTrust />
-      <Ecosystem />
-      <Technology />
+      <div id="demo">
+        <DemoSection />
+      </div>
+      <div id="proof-of-trust">
+        <ProofOfTrust />
+      </div>
+      <div id="ecosystem">
+        <Ecosystem />
+      </div>
+      <div id="technology">
+        <Technology />
+      </div>
       <MultiLayerArchitecture />
-      <Features />
-      <Security />
+      <div id="features">
+        <Features />
+      </div>
+      <div id="security">
+        <Security />
+      </div>
       <PrivacyModel />
       <Partnership />
       <RewardLayer />
       <TrustPointSystem />
-      <PoolLineup />
-      <FutureRoadmap />
+      <div id="pools">
+        <PoolLineup />
+      </div>
+      <div id="roadmap">
+        <FutureRoadmap />
+      </div>
       <CTA />
     </main>
   )

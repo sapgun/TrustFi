@@ -13,39 +13,39 @@ export default function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-32">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-20 sm:py-32">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-          <h1 className="text-6xl md:text-8xl font-bold text-white mb-4 leading-[1.2] tracking-tight">
-            <span className="block mb-2">누구나</span>
-            <span className="block mb-2">어떤 체인이든</span>
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold text-white mb-4 leading-[1.2] tracking-tight">
+            <span className="block mb-1 sm:mb-2">누구나</span>
+            <span className="block mb-1 sm:mb-2">어떤 체인이든</span>
             <span className="block bg-clip-text text-transparent bg-gradient-to-r from-teal-400 via-cyan-400 to-teal-400">
               안전하게 한 번에
             </span>
           </h1>
-          <p className="text-2xl md:text-3xl text-slate-500/60 mb-8 font-light">
+          <p className="text-lg sm:text-2xl md:text-3xl text-slate-500/60 mb-6 sm:mb-8 font-light px-4">
             Anyone, Any Chain, Securely in One Place
           </p>
 
-          <p className="text-xl md:text-2xl text-slate-400 mb-3 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-xl md:text-2xl text-slate-400 mb-2 sm:mb-3 max-w-3xl mx-auto leading-relaxed px-4">
             신뢰 기반 보상이 있는 보안 우선 멀티체인 게이트웨이
           </p>
-          <p className="text-base md:text-lg text-slate-500/70 mb-6 max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-slate-500/70 mb-4 sm:mb-6 max-w-3xl mx-auto px-4">
             Security-First Multi-Chain Gateway with Trust-Based Rewards
           </p>
 
-          <p className="text-lg text-slate-500 mb-2 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-slate-500 mb-1 sm:mb-2 max-w-2xl mx-auto px-4">
             PASS 인증부터 온체인 참여까지, 가장 빠르고 안전한 Web3 온보딩
           </p>
-          <p className="text-sm text-slate-600/70 mb-12 max-w-2xl mx-auto">
+          <p className="text-xs sm:text-sm text-slate-600/70 mb-8 sm:mb-12 max-w-2xl mx-auto px-4">
             From PASS Authentication to On-Chain Participation, The Fastest and Safest Web3 Onboarding
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 sm:mb-20 px-4">
             <Link href="/app/onboarding">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="group px-8 py-4 bg-teal-500 hover:bg-teal-400 text-black font-semibold text-lg rounded-lg transition-all flex items-center gap-2 justify-center"
+                className="group w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-teal-500 hover:bg-teal-400 text-black font-semibold text-base sm:text-lg rounded-lg transition-all flex items-center gap-2 justify-center"
               >
                 <span>
                   지금 시작하기
@@ -58,7 +58,7 @@ export default function Hero() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="px-8 py-4 bg-transparent border border-slate-700 hover:border-slate-600 text-white font-semibold text-lg rounded-lg transition-all"
+              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-transparent border border-slate-700 hover:border-slate-600 text-white font-semibold text-base sm:text-lg rounded-lg transition-all"
             >
               <span>
                 자세히 알아보기
@@ -67,7 +67,7 @@ export default function Hero() {
             </motion.button>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 max-w-4xl mx-auto px-4">
             {[
               { value: "99.9%", label: "신원 검증 성공률", labelEn: "Identity Verification" },
               { value: "6-Layer", label: "보안 OS", labelEn: "Security OS" },
@@ -81,9 +81,13 @@ export default function Hero() {
                 transition={{ duration: 0.8, delay: 0.2 + idx * 0.1 }}
                 className="text-center"
               >
-                <div className="text-4xl font-bold text-white mb-2">{stat.value}</div>
-                <div className="text-sm text-slate-500 uppercase tracking-wider mb-1">{stat.label}</div>
-                <div className="text-xs text-slate-600/70 uppercase tracking-wider">{stat.labelEn}</div>
+                <div className="text-2xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">{stat.value}</div>
+                <div className="text-xs sm:text-sm text-slate-500 uppercase tracking-wider mb-0.5 sm:mb-1 break-keep">
+                  {stat.label}
+                </div>
+                <div className="text-[10px] sm:text-xs text-slate-600/70 uppercase tracking-wider break-keep">
+                  {stat.labelEn}
+                </div>
               </motion.div>
             ))}
           </div>
