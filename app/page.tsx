@@ -9,6 +9,7 @@ import Features from "@/components/landing/Features"
 import Security from "@/components/landing/Security"
 import PrivacyModel from "@/components/landing/PrivacyModel"
 import Partnership from "@/components/landing/Partnership"
+import RewardLayer from "@/components/landing/RewardLayer"
 import FutureRoadmap from "@/components/landing/FutureRoadmap"
 import CTA from "@/components/landing/CTA"
 
@@ -26,6 +27,7 @@ export default function Home() {
       <Security />
       <PrivacyModel />
       <Partnership />
+      <RewardLayer />
       <FutureRoadmap />
       <CTA />
     </main>
