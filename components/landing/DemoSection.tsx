@@ -27,7 +27,7 @@ export default function DemoSection() {
             지금 바로 경험해보세요
           </p>
 
-          <Link href="/app/onboarding">
+          <Link href="/demo">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}

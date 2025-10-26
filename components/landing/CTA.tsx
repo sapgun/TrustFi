@@ -27,7 +27,7 @@ export default function CTA() {
               whileTap={{ scale: 0.98 }}
               className="group inline-flex items-center gap-3 px-10 py-5 bg-teal-500 hover:bg-teal-400 text-black font-semibold text-xl rounded-lg transition-all"
             >
-              데모 시작하기
+              지금 시작하기
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </Link>
