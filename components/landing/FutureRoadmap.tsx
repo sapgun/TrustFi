@@ -13,6 +13,10 @@ import {
   Network,
   Coins,
   Wallet,
+  TrendingUp,
+  FileText,
+  Zap,
+  Globe,
 } from "lucide-react"
 
 export default function FutureRoadmap() {
@@ -73,6 +77,30 @@ export default function FutureRoadmap() {
       title: "DAO 평가",
       description: "탈중앙화 조직의 거버넌스 및 재무 건전성 평가",
       color: "from-orange-500 to-red-500",
+    },
+  ]
+
+  const neoBonds = [
+    {
+      icon: Users,
+      title: "개인 채권",
+      description: "P2P 대출의 채권화",
+      features: ["소액 투자 가능", "실시간 신용등급", "자동 이자 지급"],
+      color: "from-blue-500 to-cyan-500",
+    },
+    {
+      icon: Factory,
+      title: "기업 채권",
+      description: "스타트업 성장 채권",
+      features: ["투명한 재무 공개", "마일스톤 기반", "유동성 확보"],
+      color: "from-purple-500 to-pink-500",
+    },
+    {
+      icon: Building2,
+      title: "기관 채권",
+      description: "DAO 트레저리 채권",
+      features: ["거버넌스 연동", "스마트 계약", "온체인 투명성"],
+      color: "from-green-500 to-emerald-500",
     },
   ]
 
@@ -205,6 +233,161 @@ export default function FutureRoadmap() {
             })}
           </div>
         </div>
+
+        {/* Neo Bonds Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-20"
+        >
+          <div className="text-center mb-12">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/30 rounded-full px-4 py-2 mb-6"
+            >
+              <FileText className="w-4 h-4 text-purple-400" />
+              <span className="text-sm font-medium text-purple-400">Next Generation</span>
+            </motion.div>
+            <h3 className="text-4xl font-bold text-white mb-4">Proof of Trust 기반 네오채권</h3>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+              개인, 기업, 기관 모두가 발행 가능한 블록체인 기반 채권
+            </p>
+          </div>
+
+          {/* Comparison Section */}
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="bg-slate-950 border border-slate-800 rounded-xl p-6"
+            >
+              <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center">
+                  <span className="text-slate-400">✕</span>
+                </div>
+                전통 채권
+              </h4>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-2 text-slate-400">
+                  <span className="text-slate-600">•</span>
+                  신용평가사 의존
+                </li>
+                <li className="flex items-start gap-2 text-slate-400">
+                  <span className="text-slate-600">•</span>
+                  느린 등급 업데이트
+                </li>
+                <li className="flex items-start gap-2 text-slate-400">
+                  <span className="text-slate-600">•</span>
+                  높은 발행 진입장벽
+                </li>
+                <li className="flex items-start gap-2 text-slate-400">
+                  <span className="text-slate-600">•</span>
+                  제한된 유동성
+                </li>
+              </ul>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/50 rounded-xl p-6"
+            >
+              <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-purple-400" />
+                </div>
+                네오채권
+              </h4>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-2 text-slate-200">
+                  <span className="text-purple-400">✓</span>
+                  Trust Score 기반 자동 평가
+                </li>
+                <li className="flex items-start gap-2 text-slate-200">
+                  <span className="text-purple-400">✓</span>
+                  실시간 신용등급 업데이트
+                </li>
+                <li className="flex items-start gap-2 text-slate-200">
+                  <span className="text-purple-400">✓</span>
+                  낮은 발행 진입장벽
+                </li>
+                <li className="flex items-start gap-2 text-slate-200">
+                  <span className="text-purple-400">✓</span>
+                  24/7 글로벌 유동성
+                </li>
+              </ul>
+            </motion.div>
+          </div>
+
+          {/* Neo Bond Types */}
+          <div className="grid md:grid-cols-3 gap-6">
+            {neoBonds.map((bond, idx) => {
+              const Icon = bond.icon
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="group bg-slate-950 border border-slate-800 hover:border-purple-500/50 rounded-xl p-6 transition-all duration-300"
+                >
+                  <div
+                    className={`w-12 h-12 rounded-lg bg-gradient-to-br ${bond.color} bg-opacity-10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+                  >
+                    <Icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h4 className="text-xl font-bold text-white mb-2">{bond.title}</h4>
+                  <p className="text-slate-400 mb-4 text-sm">{bond.description}</p>
+                  <div className="space-y-2">
+                    {bond.features.map((feature, featureIdx) => (
+                      <div key={featureIdx} className="flex items-center gap-2">
+                        <div className="w-1 h-1 rounded-full bg-purple-400" />
+                        <span className="text-xs text-slate-400">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
+
+          {/* Key Benefits */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-12 bg-gradient-to-r from-purple-950/50 to-pink-950/50 border border-purple-800/30 rounded-xl p-8"
+          >
+            <div className="grid md:grid-cols-4 gap-6 text-center">
+              <div>
+                <TrendingUp className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white mb-1">실시간</div>
+                <div className="text-sm text-slate-400">신용등급 업데이트</div>
+              </div>
+              <div>
+                <Globe className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white mb-1">24/7</div>
+                <div className="text-sm text-slate-400">글로벌 거래</div>
+              </div>
+              <div>
+                <Shield className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white mb-1">100%</div>
+                <div className="text-sm text-slate-400">온체인 투명성</div>
+              </div>
+              <div>
+                <Zap className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white mb-1">즉시</div>
+                <div className="text-sm text-slate-400">이자 지급</div>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
 
         {/* Enterprise Trust Score Features */}
         <motion.div
