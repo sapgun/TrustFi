@@ -1,0 +1,27 @@
+{
+  "users": [
+    {
+      "id": "user_001",
+      "name": "김철수",
+      "trustScore": 285,
+      "tier": "Silver",
+      "tierColor": "bg-gray-300 text-gray-800",
+      "nextTier": "Gold",
+      "pointsToNextTier": 15,
+      "recentActivity": [
+        {
+          "type": "safe_transaction",
+          "description": "안전한 Uniswap 거래",
+          "points": 10,
+          "timestamp": "2025-01-20T10:30:00Z"
+        },
+        {
+          "type": "kyc_verified",
+          "description": "실명 인증 완료",
+          "points": 50,
+          "timestamp": "2025-01-19T14:20:00Z"
+        }
+      ]
+    }
+  ]
+}
